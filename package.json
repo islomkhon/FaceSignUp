@@ -9,14 +9,14 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:web": "vite",
-    "dev:api": ".venv\\Scripts\\python.exe -m uvicorn backend.app:app --host 127.0.0.1 --port 8100 --reload",
-    "start": ".venv\\Scripts\\python.exe -m uvicorn backend.app:app --host 127.0.0.1 --port 8100",
+    "dev:api": "node scripts/run_python.mjs -m uvicorn backend.app:app --host 127.0.0.1 --port 8100 --reload",
+    "start": "node scripts/run_python.mjs -m uvicorn backend.app:app --host 127.0.0.1 --port 8100",
     "build": "vite build",
     "preview": "vite preview",
     "localize:mediapipe": "node scripts/localize-mediapipe.mjs",
-    "test": ".venv\\Scripts\\python.exe -m pytest -q",
+    "test": "node scripts/run_python.mjs -m pytest -q",
     "check:locales": "node scripts/check_locales.mjs",
-    "check:production": ".venv\\Scripts\\python.exe scripts\\check_production.py",
+    "check:production": "node scripts/run_python.mjs scripts/check_production.py",
     "postinstall": "node scripts/localize-mediapipe.mjs"
   },
   "dependencies": {

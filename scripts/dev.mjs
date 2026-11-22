@@ -1,13 +1,12 @@
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { pythonExecutable } from "./python-runtime.mjs";
 
 const root = process.cwd();
-const python = resolve(root, ".venv/Scripts/python.exe");
 const commands = [
   {
     name: "api",
-    command: existsSync(python) ? python : "python",
+    command: pythonExecutable(root),
     args: [
       "-m",
       "uvicorn",

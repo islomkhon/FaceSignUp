@@ -1,0 +1,44 @@
+[Unit]
+Description=FaceSignUp authentication service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=facesignup
+Group=facesignup
+WorkingDirectory=/var/www/facesignup/app
+EnvironmentFile=/var/www/facesignup/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=OMP_NUM_THREADS=1
+Environment=OPENBLAS_NUM_THREADS=1
+Environment=MALLOC_ARENA_MAX=2
+Environment=OPENCV_OPENCL_RUNTIME=disabled
+UMask=0077
+ExecStart=/var/www/facesignup/venv/bin/uvicorn backend.app:app --host 127.0.0.1 --port 8123 --workers 1 --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=20
+KillSignal=SIGINT
+StandardOutput=append:/var/log/facesignup/app.log
+StandardError=append:/var/log/facesignup/app.err.log
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+SystemCallArchitectures=native
+ReadWritePaths=/var/www/facesignup/data /var/log/facesignup
+MemoryHigh=320M
+MemoryMax=512M
+CPUQuota=50%
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

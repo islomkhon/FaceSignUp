@@ -1,0 +1,46 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      FACESIGNUP_ENV: production
+      FACESIGNUP_ALLOWED_HOSTS: ${DOMAIN:?DOMAIN is required}
+      FACESIGNUP_ALLOWED_ORIGINS: https://${DOMAIN:?DOMAIN is required}
+      FACESIGNUP_COOKIE_SECURE: "true"
+      FACESIGNUP_ALLOW_MOVEMENT_FALLBACK: "false"
+      FACESIGNUP_MAX_FRAME_BYTES: ${FACESIGNUP_MAX_FRAME_BYTES:-2097152}
+      FACESIGNUP_MAX_REQUEST_BYTES: ${FACESIGNUP_MAX_REQUEST_BYTES:-524288}
+      FACESIGNUP_EMBEDDING_KEY: ${FACESIGNUP_EMBEDDING_KEY:?FACESIGNUP_EMBEDDING_KEY is required}
+    volumes:
+      - app_data:/app/data
+    expose:
+      - "8100"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN is required}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  app_data:
+  caddy_data:
+  caddy_config:

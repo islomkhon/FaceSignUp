@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install Python dependencies
+        run: python -m pip install -r backend/requirements-dev.txt
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Validate locales
+        run: npm run check:locales
+
+      - name: Build frontend
+        env:
+          VITE_BASE: /
+        run: npm run build
+
+      - name: Run backend tests
+        run: npm test
+
+      - name: Run Ruff
+        run: |
+          python -m ruff check backend scripts
+          python -m ruff format --check backend scripts
+
+      - name: Audit production Node dependencies
+        run: npm audit --omit=dev
